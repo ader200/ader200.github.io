@@ -1,25 +1,31 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const messageInput = document.getElementById('message-input');
-    const sendButton = document.getElementById('send-button');
-    const chatMessages = document.getElementById('chat-messages');
+// Función para guardar datos en el almacenamiento local
+function guardarDatosLocalmente(datos) {
+    localStorage.setItem('datos', JSON.stringify(datos));
+}
 
-    sendButton.addEventListener('click', function() {
-        const messageText = messageInput.value.trim();
-        if (messageText !== '') {
-            sendMessage(messageText);
-            messageInput.value = '';
-        }
-    });
+// Función para descargar los datos como un archivo JSON
+function descargarDatosComoJSON() {
+    const datos = localStorage.getItem('datos');
+    const blob = new Blob([datos], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'datos.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
 
-    function sendMessage(message) {
-        const messageElement = document.createElement('div');
-        messageElement.innerText = message;
-        messageElement.classList.add('sent'); // Añadir una clase para distinguir mensajes enviados
-        chatMessages.appendChild(messageElement);
-        scrollToBottom(chatMessages);
-    }
+// Ejemplo de uso
+const datos = {
+    nombre: 'Ejemplo',
+    edad: 30,
+    imagen: 'imagen.jpg' // URL de la imagen temporal
+};
 
-    function scrollToBottom(element) {
-        element.scrollTop = element.scrollHeight;
-    }
-});
+guardarDatosLocalmente(datos);
+
+// Luego, cuando el usuario esté listo para descargar los datos
+descargarDatosComoJSON();
