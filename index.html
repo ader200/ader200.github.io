@@ -36,14 +36,25 @@
 
             // Verifica si la contraseña es "1234"
             if (password === "1234") {
-                // Guarda el usuario en el archivo JSON
                 var usuario = {
                     "username": username,
                     "password": password
                 };
-                // Guarda el usuario en el archivo JSON (puedes usar fetch o AJAX)
-                // Aquí debes manejar la lógica para guardar en el archivo datos.json
-                console.log("Usuario registrado:", usuario);
+                // Obtiene los usuarios registrados del archivo JSON
+                var usuariosRegistrados = JSON.parse(localStorage.getItem("usuarios")) || [];
+                // Verifica si el usuario ya está registrado
+                var usuarioExistente = usuariosRegistrados.find(function(u) {
+                    return u.username === username;
+                });
+                if (usuarioExistente) {
+                    alert("El usuario ya está registrado.");
+                } else {
+                    // Agrega el nuevo usuario
+                    usuariosRegistrados.push(usuario);
+                    // Guarda los usuarios en el archivo JSON
+                    localStorage.setItem("usuarios", JSON.stringify(usuariosRegistrados));
+                    alert("Usuario registrado exitosamente.");
+                }
             } else {
                 alert("La contraseña debe ser '1234'");
             }
