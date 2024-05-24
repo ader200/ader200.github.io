@@ -1,74 +1,110 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de QR</title>
-    <!-- Agrega los enlaces a las bibliotecas necesarias (por ejemplo, Bootstrap, qrcode.js, Chart.js) -->
+    <title>Railway QR App</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input, button { width: 100%; padding: 10px; }
+        button { background-color: #4CAF50; color: white; border: none; }
+        button:hover { background-color: #45a049; }
+    </style>
 </head>
 <body>
-    <h1>Generador de QR</h1>
+    <div class="container">
+        <h1>Railway QR App</h1>
+        <div id="register-section">
+            <h2>Registro</h2>
+            <div class="form-group">
+                <label for="register-username">Username</label>
+                <input type="text" id="register-username">
+            </div>
+            <div class="form-group">
+                <label for="register-password">Password</label>
+                <input type="password" id="register-password">
+            </div>
+            <button onclick="register()">Registrarse</button>
+        </div>
 
-    <!-- Formulario de registro -->
-    <div id="registro">
-        <h2>Registro de usuario</h2>
-        <input type="text" id="username" placeholder="Nombre de usuario">
-        <input type="password" id="password" placeholder="Contraseña">
-        <button onclick="registrarUsuario()">Registrar</button>
+        <div id="login-section">
+            <h2>Login</h2>
+            <div class="form-group">
+                <label for="login-username">Username</label>
+                <input type="text" id="login-username">
+            </div>
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password">
+            </div>
+            <button onclick="login()">Login</button>
+        </div>
+
+        <div id="qr-section" style="display: none;">
+            <h2>Crear QR</h2>
+            <div class="form-group">
+                <label for="qr-link">Link</label>
+                <input type="text" id="qr-link">
+            </div>
+            <div class="form-group">
+                <label for="qr-name">Nombre</label>
+                <input type="text" id="qr-name">
+            </div>
+            <button onclick="createQR()">Crear QR</button>
+        </div>
     </div>
 
-    <!-- Formulario de generación de QR -->
-    <div id="generador">
-        <h2>Generador de QR</h2>
-        <input type="text" id="url" placeholder="Ingrese el enlace">
-        <button onclick="generarQR()">Generar QR</button>
-    </div>
-
-    <!-- Sección para mostrar el QR generado -->
-    <div id="qrContainer"></div>
-
-    <!-- Script para manejar la lógica del registro y generación de QR -->
     <script>
-        // Función para registrar usuarios
-        function registrarUsuario() {
-            var username = document.getElementById("username").value;
-            var password = document.getElementById("password").value;
+        async function register() {
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
 
-            // Verifica si la contraseña es "1234"
-            if (password === "1234") {
-                var usuario = {
-                    "username": username,
-                    "password": password
-                };
-                // Obtiene los usuarios registrados del archivo JSON
-                var usuariosRegistrados = JSON.parse(localStorage.getItem("usuarios")) || [];
-                // Verifica si el usuario ya está registrado
-                var usuarioExistente = usuariosRegistrados.find(function(u) {
-                    return u.username === username;
-                });
-                if (usuarioExistente) {
-                    alert("El usuario ya está registrado.");
-                } else {
-                    // Agrega el nuevo usuario
-                    usuariosRegistrados.push(usuario);
-                    // Guarda los usuarios en el archivo JSON
-                    localStorage.setItem("usuarios", JSON.stringify(usuariosRegistrados));
-                    alert("Usuario registrado exitosamente.");
-                }
-            } else {
-                alert("La contraseña debe ser '1234'");
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const message = await response.text();
+            alert(message);
+        }
+
+        async function login() {
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const message = await response.text();
+            alert(message);
+
+            if (response.ok) {
+                document.getElementById('register-section').style.display = 'none';
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('qr-section').style.display = 'block';
             }
         }
 
-        // Función para generar QR
-        function generarQR() {
-            var url = document.getElementById("url").value;
-            var qrContainer = document.getElementById("qrContainer");
+        async function createQR() {
+            const link = document.getElementById('qr-link').value;
+            const name = document.getElementById('qr-name').value;
+            const username = document.getElementById('login-username').value;
 
-            // Genera el QR utilizando qrcode.js (o la biblioteca que elijas)
-            // Aquí debes manejar la lógica para generar y mostrar el QR
-            // Puedes usar la biblioteca qrcode.js: https://davidshimjs.github.io/qrcodejs/
-            console.log("Generando QR para:", url);
+            const response = await fetch('/create-qr', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, link, name })
+            });
+
+            const message = await response.text();
+            alert(message);
         }
     </script>
 </body>
